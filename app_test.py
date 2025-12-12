@@ -23,7 +23,6 @@ def main():
     """, unsafe_allow_html=True)
     
     st.title("大きさの変わるキーボードアプリ")
-    # ★修正箇所1: 説明文を100回→25回に変更
     st.caption("「Start」ボタンを押すと全画面表示になります。10文字入力すると自動的に次の回に進みます（全25回）。")
 
     # --- サイドバー設定 ---
@@ -212,7 +211,6 @@ def main():
             user-select: none;
         }}
 
-        /* ★ 全画面表示用のラッパーエリア */
         #experiment-area {{
             width: 100%;
             height: 100%;
@@ -225,14 +223,12 @@ def main():
             transition: background-color 0.3s;
         }}
 
-        /* PC等の全画面モード時 */
         #experiment-area:fullscreen {{
             background-color: white; 
             padding-top: 50px;
             justify-content: center;
         }}
 
-        /* ★ iPad等でAPIが効かない場合の「疑似フルスクリーン」スタイル */
         #experiment-area.pseudo-fullscreen {{
             position: fixed !important;
             top: 0 !important;
@@ -475,7 +471,7 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            const MAX_TRIALS = 25; // ★修正箇所2: トライアル回数を25回に変更
+            const MAX_TRIALS = 25; 
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -506,7 +502,7 @@ def main():
                 
                 startBtn.disabled = true;
                 nextBtn.disabled = true;
-                alert("25トライアル終了しました。お疲れ様でした。CSVをダウンロードしてください。"); // ★修正箇所3: アラートメッセージを変更
+                alert("25トライアル終了しました。お疲れ様でした。CSVをダウンロードしてください。");
             }}
 
             function updateScreenDisplay() {{
@@ -546,7 +542,9 @@ def main():
                 moveWrap.classList.add('active');
                 screen.classList.add('focused');
                 startBtn.classList.add('hidden');
-                nextBtn.disabled = false;
+                
+                // スタート直後は送信ボタンを無効化
+                nextBtn.disabled = true;
             }}
 
             rows.forEach(row => {{
@@ -562,13 +560,14 @@ def main():
                     let contentHtml = `<span class="label-top">${{k.label || ''}}</span><span class="label-sub">${{k.sub || ''}}</span>`;
                     keyDiv.innerHTML = contentHtml;
 
+                    // ★修正点1: onpointerdown では記録の準備だけ行い、文字数は増やさない
                     keyDiv.onpointerdown = (e) => {{
                         if (!isStarted) return; 
                         e.preventDefault();
 
                         let keyVal = k.val || k.label || 'Unknown';
 
-                        // ★修正1: BS含め、すべてのキーで文字数上限チェックを行う
+                        // 上限チェック
                         if (currentInputText.length >= MAX_INPUT_LENGTH) {{
                             return; 
                         }}
@@ -601,22 +600,23 @@ def main():
                         }};
 
                         lastDownTime = now;
-                        
-                        // ★修正2: 文字列カウントのロジックを変更
-                        // 通常文字(長さ1)、Space、および特殊キー(Tab, Shift, Ctrl, Alt, Win, Fn, Enter, 矢印, BS)
-                        // すべて1文字分としてカウントするために文字を追加する
-                        if (keyVal.length === 1) {{
-                            currentInputText += keyVal;
-                        }} else if (keyVal === 'Space') {{
-                            currentInputText += ' ';
-                        }} else {{
-                            // 特殊キー(Tab, Enter, Shift, BS等)の場合は、文字数カウント用のプレースホルダー(■)を追加
-                            currentInputText += '■';
-                        }}
-                        
-                        updateScreenDisplay(); 
+                        // ここでは文字を増やさない！
                     }};
 
+                    // ★修正点2: キャンセル時は、まだ文字が増えていないので、単に状態リセットするだけで良い
+                    keyDiv.onpointercancel = (e) => {{
+                        e.preventDefault();
+                        if (!keyDiv._currentData) return;
+
+                        // アクティブ状態解除のみ
+                        keyDiv.classList.remove('active');
+                        keyDiv.releasePointerCapture(e.pointerId);
+                        keyDiv._currentData = null;
+                        
+                        // 文字数は変わっていないのでupdateScreenDisplayもしなくてOK
+                    }};
+
+                    // ★修正点3: onpointerup (指を離して保存確定) のタイミングで文字数を更新する
                     keyDiv.onpointerup = (e) => {{
                         if (!isStarted) return;
                         e.preventDefault();
@@ -635,13 +635,34 @@ def main():
                             holdTime: holdTime
                         }};
                         
-                        recordedData.push(record);
-                        sessionStorage.setItem('kb_data', JSON.stringify(recordedData));
+                        // ★ここで初めて文字数を操作＆データ保存 (完全同期)
+                        if (currentInputText.length < MAX_INPUT_LENGTH) {{
+                            let keyVal = record.key;
+                            
+                            if (keyVal === 'BS') {{
+                                currentInputText = currentInputText.slice(0, -1);
+                            }} else {{
+                                if (keyVal.length === 1) {{
+                                    currentInputText += keyVal;
+                                }} else if (keyVal === 'Space') {{
+                                    currentInputText += ' ';
+                                }} else {{
+                                    currentInputText += '■';
+                                }}
+                            }}
+                            updateScreenDisplay();
+                            
+                            // データを保存
+                            recordedData.push(record);
+                            sessionStorage.setItem('kb_data', JSON.stringify(recordedData));
+                            
+                            lastUpTime = now;
+                            updateStatus();
+                        }}
                         
-                        lastUpTime = now;
-                        updateStatus();
                         keyDiv._currentData = null;
 
+                        // 自動遷移判定
                         if (currentInputText.length >= MAX_INPUT_LENGTH) {{
                             setTimeout(() => {{
                                 if (currentTrial < MAX_TRIALS) {{
@@ -650,6 +671,13 @@ def main():
                                     finishAllTrials();
                                 }}
                             }}, 200); 
+                        }}
+                        
+                        // ボタン制御
+                        if (currentInputText.length >= MAX_INPUT_LENGTH) {{
+                            nextBtn.disabled = false;
+                        }} else {{
+                            nextBtn.disabled = true;
                         }}
                     }};
                     
@@ -674,6 +702,8 @@ def main():
                 lastUpTime = taskStartTime;
                 
                 updateStatus();
+                // 次のトライアル開始時もボタンを無効化
+                nextBtn.disabled = true;
             }}
 
             function resetData() {{
