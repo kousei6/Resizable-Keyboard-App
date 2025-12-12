@@ -107,6 +107,8 @@ def main():
 
 
     # --- キーボードデータ定義 ---
+    # val: 入力値, label: 表示ラベル
+    # 特殊キーは val を空にするか、識別しやすい文字列にしておく
     rows = [
         # Row 1
         [
@@ -127,7 +129,7 @@ def main():
         ],
         # Row 2
         [
-            {"label": "Tab", "sub": "", "val": "\t", "w": 1.5, "align": "left"},
+            {"label": "Tab", "sub": "", "val": "Tab", "w": 1.5, "align": "left"}, # valをTabに変更
             {"label": "Q", "sub": "た", "val": "q", "w": 1},
             {"label": "W", "sub": "て", "val": "w", "w": 1},
             {"label": "E", "sub": "い", "val": "e", "w": 1},
@@ -144,7 +146,7 @@ def main():
         ],
         # Row 3
         [
-            {"label": "Caps", "sub": "", "val": "", "w": 1.8, "align": "left"},
+            {"label": "Caps", "sub": "", "val": "Caps", "w": 1.8, "align": "left"}, # valを追加
             {"label": "A", "sub": "ち", "val": "a", "w": 1},
             {"label": "S", "sub": "と", "val": "s", "w": 1},
             {"label": "D", "sub": "し", "val": "d", "w": 1,},
@@ -156,11 +158,11 @@ def main():
             {"label": "L", "sub": "り", "val": "l", "w": 1},
             {"label": ":", "sub": ";", "val": ":", "w": 1},
             {"label": "\"", "sub": "'", "val": "\"", "w": 1},
-            {"label": "Enter", "sub": "", "val": "\n", "w": 2.2, "align": "right"},
+            {"label": "Enter", "sub": "", "val": "Enter", "w": 2.2, "align": "right"}, # valをEnterに変更
         ],
         # Row 4
         [
-            {"label": "Shift", "sub": "", "val": "", "w": 2.3, "align": "left"},
+            {"label": "Shift", "sub": "", "val": "Shift", "w": 2.3, "align": "left"}, # valを追加
             {"label": "Z", "sub": "つ", "val": "z", "w": 1},
             {"label": "X", "sub": "さ", "val": "x", "w": 1},
             {"label": "C", "sub": "そ", "val": "c", "w": 1},
@@ -171,22 +173,22 @@ def main():
             {"label": "<", "sub": "、", "val": "<", "w": 1},
             {"label": ">", "sub": "。", "val": ">", "w": 1},
             {"label": "?", "sub": "・", "val": "?", "w": 1},
-            {"label": "Shift", "sub": "", "val": "", "w": 2.7, "align": "right"},
+            {"label": "Shift", "sub": "", "val": "Shift", "w": 2.7, "align": "right"}, # valを追加
         ],
-        # Row 5 (修正: スペースを5に減らし、上下キーを分離)
+        # Row 5
         [
-            {"label": "Ctrl", "sub": "", "val": "", "w": 1.5},
-            {"label": "Fn", "sub": "", "val": "", "w": 1},
-            {"label": "Win", "sub": "", "val": "", "w": 1},
-            {"label": "Alt", "sub": "", "val": "", "w": 1},
-            {"label": "", "sub": "", "val": " ", "w": 5},
-            {"label": "Alt", "sub": "", "val": "", "w": 1},
-            {"label": "Win", "sub": "", "val": "", "w": 1},
-            {"label": "Ctrl", "sub": "", "val": "", "w": 1},
-            {"label": "←", "sub": "", "val": "", "w": 1},
-            {"label": "↑", "sub": "", "val": "", "w": 1},
-            {"label": "↓", "sub": "", "val": "", "w": 1},
-            {"label": "→", "sub": "", "val": "", "w": 1},
+            {"label": "Ctrl", "sub": "", "val": "Ctrl", "w": 1.5},
+            {"label": "Fn", "sub": "", "val": "Fn", "w": 1},
+            {"label": "Win", "sub": "", "val": "Win", "w": 1},
+            {"label": "Alt", "sub": "", "val": "Alt", "w": 1},
+            {"label": "", "sub": "", "val": "Space", "w": 5}, # Spaceと明記
+            {"label": "Alt", "sub": "", "val": "Alt", "w": 1},
+            {"label": "Win", "sub": "", "val": "Win", "w": 1},
+            {"label": "Ctrl", "sub": "", "val": "Ctrl", "w": 1},
+            {"label": "←", "sub": "", "val": "Left", "w": 1},
+            {"label": "↑", "sub": "", "val": "Up", "w": 1},
+            {"label": "↓", "sub": "", "val": "Down", "w": 1},
+            {"label": "→", "sub": "", "val": "Right", "w": 1},
         ]
     ]
 
@@ -240,7 +242,7 @@ def main():
             z-index: 1;
             pointer-events: none;
             letter-spacing: 0px; 
-            white-space: pre; /* スペースをそのまま表示してズレを防ぐ */
+            white-space: pre; 
         }}
 
         /* 前面の入力欄 (Password Type) */
@@ -251,7 +253,7 @@ def main():
             width: 100%;
             height: 100%;
             background-color: transparent; 
-            color: #000; /* 入力文字（●）を黒にする */
+            color: #000;
             font-size: 20px;
             font-family: 'Roboto Mono', monospace;
             border-radius: 8px;
@@ -296,7 +298,6 @@ def main():
         #start-btn {{ background-color: #ff9800; color: white; font-weight: bold; font-size: 16px; padding: 10px 24px; }}
         #start-btn:hover {{ background-color: #f57c00; }}
         
-        /* 隠すためのクラス */
         .hidden {{ display: none !important; }}
 
         #next-btn {{ background-color: #2196F3; color: white; }}
@@ -451,33 +452,30 @@ def main():
             let isStarted = false;
 
             updateStatus();
-            updateTargetDisplay(); // 初期表示更新
+            updateTargetDisplay(); 
 
-            // --- 背景文字の更新（入力に合わせて消していく） ---
             function updateTargetDisplay() {{
                 const inputLen = screen.value.length;
-                // 入力文字数分だけスペースに置き換える
                 const hiddenPrefix = " ".repeat(inputLen);
                 const visibleSuffix = targetString.slice(inputLen);
                 targetText.textContent = hiddenPrefix + visibleSuffix;
             }}
 
-            // --- Startボタン処理 ---
             function startTask() {{
                 isStarted = true;
                 taskStartTime = Date.now();
                 
-                // UIの有効化
+                lastDownTime = taskStartTime;
+                lastUpTime = taskStartTime;
+                
                 moveWrap.classList.add('active');
                 screen.disabled = false;
                 screen.focus();
                 
-                // Startボタンを隠す
                 startBtn.classList.add('hidden');
                 nextBtn.disabled = false;
             }}
 
-            // --- キーボード生成 ---
             rows.forEach(row => {{
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'kb-row';
@@ -492,7 +490,6 @@ def main():
                     let contentHtml = `<span class="label-top">${{k.label || ''}}</span><span class="label-sub">${{k.sub || ''}}</span>`;
                     keyDiv.innerHTML = contentHtml;
 
-                    // ポインターダウン (押下)
                     keyDiv.onpointerdown = (e) => {{
                         if (!isStarted) return; 
                         
@@ -506,13 +503,19 @@ def main():
                         const matrix = new DOMMatrix(style.transform);
                         const currentScale = matrix.a;
 
-                        let downDownTime = lastDownTime ? (now - lastDownTime) : '';
-                        let upDownTime = lastUpTime ? (now - lastUpTime) : '';
+                        let downDownTime = (now - lastDownTime);
+                        let upDownTime = (now - lastUpTime);
                         let timeFromStart = (now - taskStartTime);
+
+                        // Keyの値を取得（valがあればそれ、なければlabel）
+                        let keyVal = k.val;
+                        if (!keyVal) {{
+                            keyVal = k.label || 'Unknown';
+                        }}
 
                         keyDiv._currentData = {{
                             trial: currentTrial,
-                            key: k.val || k.label || 'Unknown',
+                            key: keyVal,
                             downTime: now,
                             timeFromStart: timeFromStart,
                             downDown: downDownTime,
@@ -526,16 +529,20 @@ def main():
 
                         lastDownTime = now;
                         
-                        if (k.val === 'BS') {{
+                        // 文字入力処理 (特殊キー以外)
+                        if (keyVal.length === 1) {{ 
+                            // 1文字のキーのみ入力欄に反映 (Space等は除外されるが、Spaceキーの値は 'Space' としたのでOK)
+                            // ただし 'Space' の場合は空白を入れる必要があるなら以下で分岐
+                            screen.value += keyVal;
+                        }} else if (keyVal === 'Space') {{
+                            screen.value += ' ';
+                        }} else if (keyVal === 'BS') {{
                             screen.value = screen.value.slice(0, -1);
-                        }} else if (k.val) {{
-                            screen.value += k.val;
                         }}
                         
-                        updateTargetDisplay(); // 背景文字更新
+                        updateTargetDisplay(); 
                     }};
 
-                    // ポインターアップ (離上)
                     keyDiv.onpointerup = (e) => {{
                         if (!isStarted) return;
 
@@ -576,12 +583,13 @@ def main():
                 currentTrial++;
                 sessionStorage.setItem('kb_trial', currentTrial);
                 screen.value = "";
-                updateTargetDisplay(); // 背景文字リセット
+                updateTargetDisplay();
                 
-                // 次の試行：Startボタンは出さず、そのまま継続
-                taskStartTime = Date.now(); // タイマーリセット(この時点からTrial N開始とする)
+                taskStartTime = Date.now(); 
+                lastDownTime = taskStartTime;
+                lastUpTime = taskStartTime;
+                
                 screen.focus();
-
                 updateStatus();
             }}
 
@@ -593,12 +601,14 @@ def main():
                     screen.value = "";
                     updateTargetDisplay();
                     
-                    // 完全初期化（Startボタン復活）
                     isStarted = false;
                     taskStartTime = null;
+                    lastDownTime = null;
+                    lastUpTime = null;
+                    
                     moveWrap.classList.remove('active');
                     screen.disabled = true;
-                    startBtn.classList.remove('hidden'); // Startボタン再表示
+                    startBtn.classList.remove('hidden'); 
                     startBtn.disabled = false;
                     nextBtn.disabled = true;
 
@@ -623,9 +633,11 @@ def main():
                 const csvRows = [headers.join(",")];
                 
                 recordedData.forEach(d => {{
+                    // CSV形式を壊さないよう、ダブルクォートで囲む
+                    // また、キー名にダブルクォートが含まれる場合はエスケープが必要だが今回は簡易的に囲むのみ
                     const row = [
                         d.trial,
-                        `"${{d.key}}"`,
+                        `"${{d.key}}"`, 
                         d.timeFromStart,
                         d.downTime,
                         d.upTime,
