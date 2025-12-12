@@ -471,7 +471,7 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            const MAX_TRIALS = 25; 
+            const MAX_TRIALS = 100; 
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -502,7 +502,7 @@ def main():
                 
                 startBtn.disabled = true;
                 nextBtn.disabled = true;
-                alert("25トライアル終了しました。お疲れ様でした。CSVをダウンロードしてください。");
+                alert("100トライアル終了しました。お疲れ様でした。CSVをダウンロードしてください。");
             }}
 
             function updateScreenDisplay() {{
