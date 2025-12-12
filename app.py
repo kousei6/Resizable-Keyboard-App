@@ -567,9 +567,8 @@ def main():
 
                         let keyVal = k.val || k.label || 'Unknown';
 
-                        // ★修正1: BS以外は、特殊キー含めて上限に達していたら入力を受け付けない
-                        // (以前は '&& keyVal !== 'Enter'' があったが、Enterも1文字カウントするならここでブロックすべき)
-                        if (currentInputText.length >= MAX_INPUT_LENGTH && keyVal !== 'BS') {{
+                        // ★修正1: BS含め、すべてのキーで文字数上限チェックを行う
+                        if (currentInputText.length >= MAX_INPUT_LENGTH) {{
                             return; 
                         }}
 
@@ -603,20 +602,15 @@ def main():
                         lastDownTime = now;
                         
                         // ★修正2: 文字列カウントのロジックを変更
-                        if (keyVal === 'BS') {{
-                            currentInputText = currentInputText.slice(0, -1);
+                        // 通常文字(長さ1)、Space、および特殊キー(Tab, Shift, Ctrl, Alt, Win, Fn, Enter, 矢印, BS)
+                        // すべて1文字分としてカウントするために文字を追加する
+                        if (keyVal.length === 1) {{
+                            currentInputText += keyVal;
+                        }} else if (keyVal === 'Space') {{
+                            currentInputText += ' ';
                         }} else {{
-                            // 通常文字(長さ1)、Space、および特殊キー(Tab, Shift, Ctrl, Alt, Win, Fn, Enter, 矢印)
-                            // すべて1文字分としてカウントするために文字を追加する
-                            if (keyVal.length === 1) {{
-                                currentInputText += keyVal;
-                            }} else if (keyVal === 'Space') {{
-                                currentInputText += ' ';
-                            }} else {{
-                                // 特殊キー(Tab, Enter, Shift等)の場合は、文字数カウント用のプレースホルダー(■)を追加
-                                // ※画面上はマスク('•')されるため、何を追加しても長さが1増えればOK
-                                currentInputText += '■';
-                            }}
+                            // 特殊キー(Tab, Enter, Shift, BS等)の場合は、文字数カウント用のプレースホルダー(■)を追加
+                            currentInputText += '■';
                         }}
                         
                         updateScreenDisplay(); 
