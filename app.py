@@ -157,7 +157,7 @@ def main():
             {"label": "K", "sub": "の", "val": "k", "w": 1},
             {"label": "L", "sub": "り", "val": "l", "w": 1},
             {"label": ":", "sub": ";", "val": ":", "w": 1},
-            {"label": "\"", "sub": "'", "val": "\"", "w": 1},
+            {"label": "\"", "sub": "'", "val": "double quotation", "w": 1},
             {"label": "Enter", "sub": "", "val": "Enter", "w": 2.2, "align": "right"}, # valをEnterに変更
         ],
         # Row 4
