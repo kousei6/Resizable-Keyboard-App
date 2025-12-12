@@ -23,7 +23,7 @@ def main():
     """, unsafe_allow_html=True)
     
     st.title("大きさの変わるキーボードアプリ")
-    st.caption("「Start」ボタンを押して開始してください。「password18」と入力します。")
+    st.caption("「Start」ボタンを押すと全画面表示になります。10文字入力すると自動的に次の回に進みます（全100回）。")
 
     # --- サイドバー設定 ---
     with st.sidebar:
@@ -107,8 +107,6 @@ def main():
 
 
     # --- キーボードデータ定義 ---
-    # val: 入力値, label: 表示ラベル
-    # 特殊キーは val を空にするか、識別しやすい文字列にしておく
     rows = [
         # Row 1
         [
@@ -129,7 +127,7 @@ def main():
         ],
         # Row 2
         [
-            {"label": "Tab", "sub": "", "val": "Tab", "w": 1.5, "align": "left"}, # valをTabに変更
+            {"label": "Tab", "sub": "", "val": "Tab", "w": 1.5, "align": "left"},
             {"label": "Q", "sub": "た", "val": "q", "w": 1},
             {"label": "W", "sub": "て", "val": "w", "w": 1},
             {"label": "E", "sub": "い", "val": "e", "w": 1},
@@ -146,7 +144,7 @@ def main():
         ],
         # Row 3
         [
-            {"label": "Caps", "sub": "", "val": "Caps", "w": 1.8, "align": "left"}, # valを追加
+            {"label": "Caps", "sub": "", "val": "Caps", "w": 1.8, "align": "left"},
             {"label": "A", "sub": "ち", "val": "a", "w": 1},
             {"label": "S", "sub": "と", "val": "s", "w": 1},
             {"label": "D", "sub": "し", "val": "d", "w": 1,},
@@ -157,12 +155,12 @@ def main():
             {"label": "K", "sub": "の", "val": "k", "w": 1},
             {"label": "L", "sub": "り", "val": "l", "w": 1},
             {"label": ":", "sub": ";", "val": ":", "w": 1},
-            {"label": "\"", "sub": "'", "val": "double quotation", "w": 1},
-            {"label": "Enter", "sub": "", "val": "Enter", "w": 2.2, "align": "right"}, # valをEnterに変更
+            {"label": "\"", "sub": "'", "val": "\"", "w": 1}, 
+            {"label": "Enter", "sub": "", "val": "Enter", "w": 2.2, "align": "right"},
         ],
         # Row 4
         [
-            {"label": "Shift", "sub": "", "val": "Shift", "w": 2.3, "align": "left"}, # valを追加
+            {"label": "Shift", "sub": "", "val": "LShift", "w": 2.3, "align": "left"}, # LShift
             {"label": "Z", "sub": "つ", "val": "z", "w": 1},
             {"label": "X", "sub": "さ", "val": "x", "w": 1},
             {"label": "C", "sub": "そ", "val": "c", "w": 1},
@@ -173,18 +171,18 @@ def main():
             {"label": "<", "sub": "、", "val": "<", "w": 1},
             {"label": ">", "sub": "。", "val": ">", "w": 1},
             {"label": "?", "sub": "・", "val": "?", "w": 1},
-            {"label": "Shift", "sub": "", "val": "Shift", "w": 2.7, "align": "right"}, # valを追加
+            {"label": "Shift", "sub": "", "val": "RShift", "w": 2.7, "align": "right"}, # RShift
         ],
         # Row 5
         [
-            {"label": "Ctrl", "sub": "", "val": "Ctrl", "w": 1.5},
+            {"label": "Ctrl", "sub": "", "val": "LCtrl", "w": 1.5}, # LCtrl
             {"label": "Fn", "sub": "", "val": "Fn", "w": 1},
-            {"label": "Win", "sub": "", "val": "Win", "w": 1},
-            {"label": "Alt", "sub": "", "val": "Alt", "w": 1},
-            {"label": "", "sub": "", "val": "Space", "w": 5}, # Spaceと明記
-            {"label": "Alt", "sub": "", "val": "Alt", "w": 1},
-            {"label": "Win", "sub": "", "val": "Win", "w": 1},
-            {"label": "Ctrl", "sub": "", "val": "Ctrl", "w": 1},
+            {"label": "Win", "sub": "", "val": "LWin", "w": 1},   # LWin
+            {"label": "Alt", "sub": "", "val": "LAlt", "w": 1},   # LAlt
+            {"label": "", "sub": "", "val": "Space", "w": 5},
+            {"label": "Alt", "sub": "", "val": "RAlt", "w": 1},   # RAlt
+            {"label": "Win", "sub": "", "val": "RWin", "w": 1},   # RWin
+            {"label": "Ctrl", "sub": "", "val": "RCtrl", "w": 1}, # RCtrl
             {"label": "←", "sub": "", "val": "Left", "w": 1},
             {"label": "↑", "sub": "", "val": "Up", "w": 1},
             {"label": "↓", "sub": "", "val": "Down", "w": 1},
@@ -205,9 +203,6 @@ def main():
         body {{
             font-family: 'Roboto Mono', 'Noto Sans JP', monospace;
             background-color: transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             margin: 0;
             padding: 0;
             width: 100%;
@@ -216,23 +211,54 @@ def main():
             user-select: none;
         }}
 
-        /* --- 1. 入力欄まわりのスタイル --- */
+        /* ★ 全画面表示用のラッパーエリア */
+        #experiment-area {{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 20px;
+            background-color: transparent; 
+            transition: background-color 0.3s;
+        }}
+
+        /* PC等の全画面モード時 */
+        #experiment-area:fullscreen {{
+            background-color: white; 
+            padding-top: 50px;
+            justify-content: center;
+        }}
+
+        /* ★ iPad等でAPIが効かない場合の「疑似フルスクリーン」スタイル */
+        #experiment-area.pseudo-fullscreen {{
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: white !important;
+            z-index: 9999 !important;
+            padding-top: 50px;
+            justify-content: center;
+        }}
+
         .input-container {{
             position: relative;
             width: 95%;
             height: 50px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             z-index: 200;
         }}
 
-        /* 背景の薄い文字 */
         #target-text {{
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            font-size: 20px;
+            font-size: 24px;
             font-family: 'Roboto Mono', monospace; 
             color: #ccc; 
             display: flex;
@@ -245,32 +271,34 @@ def main():
             white-space: pre; 
         }}
 
-        /* 前面の入力欄 (Password Type) */
         #screen {{
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: transparent; 
+            background-color: rgba(255, 255, 255, 0.1); 
             color: #000;
-            font-size: 20px;
+            font-size: 24px;
             font-family: 'Roboto Mono', monospace;
             border-radius: 8px;
             padding: 10px;
             border: 2px solid #555;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            resize: none;
             box-sizing: border-box;
             z-index: 2;
             letter-spacing: 0px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: pre;
         }}
-        #screen:focus {{
-            outline: none;
+        
+        #screen.focused {{
             border-color: #2196F3;
+            background-color: transparent; 
         }}
 
-        /* --- 2. コントロールエリア --- */
         .controls {{
             display: flex;
             gap: 10px;
@@ -284,18 +312,18 @@ def main():
         }}
 
         button {{
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-family: 'Noto Sans JP', sans-serif;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             transition: 0.2s;
         }}
         button:active {{ transform: translateY(2px); box-shadow: 0 2px 2px rgba(0,0,0,0.2); }}
 
-        #start-btn {{ background-color: #ff9800; color: white; font-weight: bold; font-size: 16px; padding: 10px 24px; }}
+        #start-btn {{ background-color: #ff9800; color: white; font-weight: bold; font-size: 18px; padding: 12px 30px; }}
         #start-btn:hover {{ background-color: #f57c00; }}
         
         .hidden {{ display: none !important; }}
@@ -312,15 +340,14 @@ def main():
 
         #data-count {{ 
             color: #333; 
-            font-size: 14px; 
+            font-size: 18px; 
             font-weight: bold; 
             background: #fff;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 4px;
             border: 1px solid #ccc;
         }}
 
-        /* --- アニメーション定義 --- */
         @keyframes breathe {{
             0% {{ transform: scaleX({scale_min}) scaleY({scale_min}); }}
             50% {{ transform: scaleX({scale_max}) scaleY({scale_max}); }}
@@ -329,7 +356,6 @@ def main():
 
         {keyframes_css}
 
-        /* --- 3. キーボードエリア --- */
         .movement-wrapper {{
             animation: floatKeyframes {total_move_duration}s infinite linear;
             animation-play-state: paused;
@@ -414,21 +440,24 @@ def main():
     </style>
     </head>
     <body>
-        <div class="input-container">
-            <div id="target-text">password18</div>
-            <input type="password" id="screen" placeholder="" disabled>
-        </div>
-        
-        <div class="controls">
-            <button id="start-btn" onclick="startTask()">Start</button>
-            <button id="next-btn" onclick="nextTrial()" disabled>送信 (Next Trial)</button>
-            <button id="download-btn" onclick="downloadCSV()">CSVをダウンロード</button>
-            <button id="reset-btn" onclick="resetData()">リセット</button>
-            <span id="data-count">Trial: 1 | Rec: 0</span>
-        </div>
+        <div id="experiment-area">
+            
+            <div class="input-container">
+                <div id="target-text">password18</div>
+                <div id="screen"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="start-btn" onclick="startTask()">Start (Fullscreen)</button>
+                <button id="next-btn" onclick="nextTrial()" disabled>送信 (Next Trial)</button>
+                <button id="download-btn" onclick="downloadCSV()">CSVをダウンロード</button>
+                <button id="reset-btn" onclick="resetData()">リセット</button>
+                <span id="data-count">Trial: 1 | Rec: 0</span>
+            </div>
 
-        <div class="movement-wrapper" id="move-wrap">
-            <div class="keyboard-wrapper" id="kb-wrap"></div>
+            <div class="movement-wrapper" id="move-wrap">
+                <div class="keyboard-wrapper" id="kb-wrap"></div>
+            </div>
         </div>
 
         <script>
@@ -440,8 +469,12 @@ def main():
             const startBtn = document.getElementById('start-btn');
             const nextBtn = document.getElementById('next-btn');
             const moveWrap = document.getElementById('move-wrap');
+            const experimentArea = document.getElementById('experiment-area');
             
             const targetString = "password18";
+            
+            const MAX_INPUT_LENGTH = 10;
+            const MAX_TRIALS = 100;
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -450,28 +483,67 @@ def main():
             let lastUpTime = null;
             let taskStartTime = null; 
             let isStarted = false;
+            
+            let currentInputText = "";
 
             updateStatus();
-            updateTargetDisplay(); 
+            updateScreenDisplay(); 
 
-            function updateTargetDisplay() {{
-                const inputLen = screen.value.length;
+            // ★ 完了時の処理
+            function finishAllTrials() {{
+                isStarted = false;
+                moveWrap.classList.remove('active');
+                screen.classList.remove('focused');
+                
+                // 全画面解除
+                experimentArea.classList.remove('pseudo-fullscreen');
+                if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
+                
+                screen.textContent = "FINISHED";
+                targetText.textContent = "";
+                dataCountLabel.innerText = "Task Completed!";
+                
+                startBtn.disabled = true;
+                nextBtn.disabled = true;
+                alert("100トライアル終了しました。お疲れ様でした。CSVをダウンロードしてください。");
+            }}
+
+            function updateScreenDisplay() {{
+                const inputLen = currentInputText.length;
+                screen.textContent = "•".repeat(inputLen);
+                
                 const hiddenPrefix = " ".repeat(inputLen);
                 const visibleSuffix = targetString.slice(inputLen);
                 targetText.textContent = hiddenPrefix + visibleSuffix;
             }}
 
             function startTask() {{
+                if (currentTrial > MAX_TRIALS) {{
+                     finishAllTrials();
+                     return;
+                }}
+
+                // ★ iPad対応: 常にCSSの疑似フルスクリーンを適用する (APIが効いても効かなくてもOK)
+                experimentArea.classList.add('pseudo-fullscreen');
+
+                // 一応PC向けに標準APIも試みる
+                if (experimentArea.requestFullscreen) {{
+                    experimentArea.requestFullscreen().catch(err => {{
+                        console.log("Native fullscreen blocked, using pseudo-fullscreen.");
+                    }});
+                }} else if (experimentArea.webkitRequestFullscreen) {{ /* Safari */
+                    experimentArea.webkitRequestFullscreen();
+                }} else if (experimentArea.msRequestFullscreen) {{ /* IE11 */
+                    experimentArea.msRequestFullscreen();
+                }}
+
                 isStarted = true;
                 taskStartTime = Date.now();
-                
                 lastDownTime = taskStartTime;
                 lastUpTime = taskStartTime;
                 
                 moveWrap.classList.add('active');
-                screen.disabled = false;
-                screen.focus();
-                
+                screen.classList.add('focused');
                 startBtn.classList.add('hidden');
                 nextBtn.disabled = false;
             }}
@@ -484,7 +556,6 @@ def main():
                     const keyDiv = document.createElement('div');
                     keyDiv.className = 'key';
                     keyDiv.style.flexGrow = k.w;
-                    
                     if(k.color) keyDiv.classList.add('color-' + k.color);
 
                     let contentHtml = `<span class="label-top">${{k.label || ''}}</span><span class="label-sub">${{k.sub || ''}}</span>`;
@@ -492,8 +563,16 @@ def main():
 
                     keyDiv.onpointerdown = (e) => {{
                         if (!isStarted) return; 
-                        
                         e.preventDefault();
+
+                        let keyVal = k.val || k.label || 'Unknown';
+
+                        // ★修正1: BS以外は、特殊キー含めて上限に達していたら入力を受け付けない
+                        // (以前は '&& keyVal !== 'Enter'' があったが、Enterも1文字カウントするならここでブロックすべき)
+                        if (currentInputText.length >= MAX_INPUT_LENGTH && keyVal !== 'BS') {{
+                            return; 
+                        }}
+
                         keyDiv.classList.add('active');
                         keyDiv.setPointerCapture(e.pointerId);
 
@@ -506,12 +585,6 @@ def main():
                         let downDownTime = (now - lastDownTime);
                         let upDownTime = (now - lastUpTime);
                         let timeFromStart = (now - taskStartTime);
-
-                        // Keyの値を取得（valがあればそれ、なければlabel）
-                        let keyVal = k.val;
-                        if (!keyVal) {{
-                            keyVal = k.label || 'Unknown';
-                        }}
 
                         keyDiv._currentData = {{
                             trial: currentTrial,
@@ -529,67 +602,82 @@ def main():
 
                         lastDownTime = now;
                         
-                        // 文字入力処理 (特殊キー以外)
-                        if (keyVal.length === 1) {{ 
-                            // 1文字のキーのみ入力欄に反映 (Space等は除外されるが、Spaceキーの値は 'Space' としたのでOK)
-                            // ただし 'Space' の場合は空白を入れる必要があるなら以下で分岐
-                            screen.value += keyVal;
-                        }} else if (keyVal === 'Space') {{
-                            screen.value += ' ';
-                        }} else if (keyVal === 'BS') {{
-                            screen.value = screen.value.slice(0, -1);
+                        // ★修正2: 文字列カウントのロジックを変更
+                        if (keyVal === 'BS') {{
+                            currentInputText = currentInputText.slice(0, -1);
+                        }} else {{
+                            // 通常文字(長さ1)、Space、および特殊キー(Tab, Shift, Ctrl, Alt, Win, Fn, Enter, 矢印)
+                            // すべて1文字分としてカウントするために文字を追加する
+                            if (keyVal.length === 1) {{
+                                currentInputText += keyVal;
+                            }} else if (keyVal === 'Space') {{
+                                currentInputText += ' ';
+                            }} else {{
+                                // 特殊キー(Tab, Enter, Shift等)の場合は、文字数カウント用のプレースホルダー(■)を追加
+                                // ※画面上はマスク('•')されるため、何を追加しても長さが1増えればOK
+                                currentInputText += '■';
+                            }}
                         }}
                         
-                        updateTargetDisplay(); 
+                        updateScreenDisplay(); 
                     }};
 
                     keyDiv.onpointerup = (e) => {{
                         if (!isStarted) return;
-
                         e.preventDefault();
+                        
+                        if (!keyDiv._currentData) return;
+
                         keyDiv.classList.remove('active');
                         keyDiv.releasePointerCapture(e.pointerId);
                         
-                        if (keyDiv._currentData) {{
-                            const now = Date.now();
-                            const holdTime = now - keyDiv._currentData.downTime;
-                            
-                            const record = {{
-                                ...keyDiv._currentData,
-                                upTime: now,
-                                holdTime: holdTime
-                            }};
-                            
-                            recordedData.push(record);
-                            sessionStorage.setItem('kb_data', JSON.stringify(recordedData));
-                            
-                            lastUpTime = now;
-                            updateStatus();
-                            keyDiv._currentData = null;
+                        const now = Date.now();
+                        const holdTime = now - keyDiv._currentData.downTime;
+                        
+                        const record = {{
+                            ...keyDiv._currentData,
+                            upTime: now,
+                            holdTime: holdTime
+                        }};
+                        
+                        recordedData.push(record);
+                        sessionStorage.setItem('kb_data', JSON.stringify(recordedData));
+                        
+                        lastUpTime = now;
+                        updateStatus();
+                        keyDiv._currentData = null;
+
+                        if (currentInputText.length >= MAX_INPUT_LENGTH) {{
+                            setTimeout(() => {{
+                                if (currentTrial < MAX_TRIALS) {{
+                                    nextTrial();
+                                }} else {{
+                                    finishAllTrials();
+                                }}
+                            }}, 200); 
                         }}
                     }};
                     
                     rowDiv.appendChild(keyDiv);
                 }});
-
                 kbContainer.appendChild(rowDiv);
             }});
 
             function updateStatus() {{
-                dataCountLabel.innerText = `Trial: ${{currentTrial}} | Rec: ${{recordedData.length}}`;
+                dataCountLabel.innerText = `Trial: ${{currentTrial}} / ${{MAX_TRIALS}} | Rec: ${{recordedData.length}}`;
             }}
 
             function nextTrial() {{
                 currentTrial++;
                 sessionStorage.setItem('kb_trial', currentTrial);
-                screen.value = "";
-                updateTargetDisplay();
+                
+                currentInputText = "";
+                updateScreenDisplay();
                 
                 taskStartTime = Date.now(); 
                 lastDownTime = taskStartTime;
                 lastUpTime = taskStartTime;
                 
-                screen.focus();
                 updateStatus();
             }}
 
@@ -598,8 +686,9 @@ def main():
                     recordedData = [];
                     currentTrial = 1;
                     sessionStorage.clear();
-                    screen.value = "";
-                    updateTargetDisplay();
+                    
+                    currentInputText = "";
+                    updateScreenDisplay();
                     
                     isStarted = false;
                     taskStartTime = null;
@@ -607,10 +696,17 @@ def main():
                     lastUpTime = null;
                     
                     moveWrap.classList.remove('active');
-                    screen.disabled = true;
+                    screen.classList.remove('focused');
+                    
                     startBtn.classList.remove('hidden'); 
                     startBtn.disabled = false;
                     nextBtn.disabled = true;
+                    
+                    screen.textContent = "";
+
+                    // 全画面解除
+                    experimentArea.classList.remove('pseudo-fullscreen');
+                    if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
 
                     updateStatus();
                 }}
@@ -621,7 +717,6 @@ def main():
                     alert("No data collected yet!");
                     return;
                 }}
-
                 const headers = [
                     "Trial", "Key", 
                     "TimeFromStart(ms)", "DownTime(ms)", "UpTime(ms)", 
@@ -629,34 +724,20 @@ def main():
                     "Scale", "Kb_X", "Kb_Y", 
                     "Pressure", "FingerArea"
                 ];
-
                 const csvRows = [headers.join(",")];
-                
                 recordedData.forEach(d => {{
-                    // CSV形式を壊さないよう、ダブルクォートで囲む
-                    // また、キー名にダブルクォートが含まれる場合はエスケープが必要だが今回は簡易的に囲むのみ
+                    let safeKey = d.key.replace(/"/g, '""');
                     const row = [
-                        d.trial,
-                        `"${{d.key}}"`, 
-                        d.timeFromStart,
-                        d.downTime,
-                        d.upTime,
-                        d.holdTime,
-                        d.downDown,
-                        d.upDown,
-                        d.kbScale,
-                        d.kbX,
-                        d.kbY,
-                        d.pressure,
-                        d.area
+                        d.trial, `"${{safeKey}}"`, d.timeFromStart,
+                        d.downTime, d.upTime, d.holdTime,
+                        d.downDown, d.upDown, d.kbScale,
+                        d.kbX, d.kbY, d.pressure, d.area
                     ];
                     csvRows.push(row.join(","));
                 }});
-
                 const csvString = csvRows.join("\\n");
                 const blob = new Blob([csvString], {{ type: "text/csv" }});
                 const url = URL.createObjectURL(blob);
-                
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = "keyboard_data.csv";
