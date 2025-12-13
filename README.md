@@ -32,7 +32,7 @@
 
 ## 動作環境
 
-  * Python 3.13.9
+  * Python 3.13
   * Streamlit
 
 ## インストールと実行
