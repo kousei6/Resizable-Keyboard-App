@@ -22,8 +22,8 @@ def main():
         </style>
     """, unsafe_allow_html=True)
     
-    st.title("大きさの変わるキーボードアプリ (8方向版)")
-    st.caption("「Start」ボタンを押すと全画面表示になります。8文字入力x8回（全方向1周）で終了し、座標の最大・最小が表示されます。")
+    st.title("大きさの変わるキーボードアプリ")
+    st.caption("「Start」ボタンを押すと開始します（全画面にはなりません）。10文字入力すると自動的に次の回に進みます（全100回）。")
 
     # --- サイドバー設定 ---
     with st.sidebar:
@@ -54,8 +54,7 @@ def main():
         
         # 移動パスの生成
         generated_path = []
-        # ★変更点1: 1サイクル(8方向)だけ生成するように変更 (元は20)
-        cycle_count = 1 
+        cycle_count = 20 
         
         base_dirs = list(dir_vectors.values())
         
@@ -446,7 +445,7 @@ def main():
             </div>
             
             <div class="controls">
-                <button id="start-btn" onclick="startTask()">Start (Fullscreen)</button>
+                <button id="start-btn" onclick="startTask()">Start</button>
                 <button id="next-btn" onclick="nextTrial()" disabled>送信 (Next Trial)</button>
                 <button id="download-btn" onclick="downloadCSV()">CSVをダウンロード</button>
                 <button id="reset-btn" onclick="resetData()">リセット</button>
@@ -472,7 +471,7 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            const MAX_TRIALS = 8; // ★変更点2: 試行回数を8回に設定
+            const MAX_TRIALS = 100; 
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -493,9 +492,9 @@ def main():
                 moveWrap.classList.remove('active');
                 screen.classList.remove('focused');
                 
-                // 全画面解除
-                experimentArea.classList.remove('pseudo-fullscreen');
-                if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
+                // ★ 全画面解除処理をコメントアウト(そもそも全画面にしていないため)
+                // experimentArea.classList.remove('pseudo-fullscreen');
+                // if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
                 
                 screen.textContent = "FINISHED";
                 targetText.textContent = "";
@@ -503,12 +502,11 @@ def main():
                 
                 startBtn.disabled = true;
                 nextBtn.disabled = true;
-                
-                // ★変更点3: 記録されたデータから X, Y の最小・最大を計算して表示
-                let msg = "全8回のトライアルが終了しました。お疲れ様でした。";
+
+                // ★ 追加: 座標範囲の計算と表示
+                let msg = "100トライアル終了しました。お疲れ様でした。";
                 
                 if (recordedData.length > 0) {{
-                    // 数値に変換して配列化
                     let xs = recordedData.map(d => parseFloat(d.kbX));
                     let ys = recordedData.map(d => parseFloat(d.kbY));
                     
@@ -517,7 +515,7 @@ def main():
                     let minY = Math.min(...ys);
                     let maxY = Math.max(...ys);
                     
-                    // Pythonのf-string内では、JSの変数を埋め込む ${{...}} をエスケープする必要があります
+                    // Python f-string内でのJS変数展開のため {{ }} でエスケープ
                     msg += `\\n\\n【記録された座標範囲】\\nKb_X: ${{minX.toFixed(1)}} ~ ${{maxX.toFixed(1)}}\\nKb_Y: ${{minY.toFixed(1)}} ~ ${{maxY.toFixed(1)}}`;
                 }}
 
@@ -539,19 +537,21 @@ def main():
                      return;
                 }}
 
-                // ★ iPad対応: 常にCSSの疑似フルスクリーンを適用する (APIが効いても効かなくてもOK)
-                experimentArea.classList.add('pseudo-fullscreen');
+                // ★ 変更点: 全画面表示(pseudo-fullscreen / requestFullscreen)を無効化
+                
+                // experimentArea.classList.add('pseudo-fullscreen');
 
-                // 一応PC向けに標準APIも試みる
+                /*
                 if (experimentArea.requestFullscreen) {{
                     experimentArea.requestFullscreen().catch(err => {{
                         console.log("Native fullscreen blocked, using pseudo-fullscreen.");
                     }});
-                }} else if (experimentArea.webkitRequestFullscreen) {{ /* Safari */
+                }} else if (experimentArea.webkitRequestFullscreen) {{ 
                     experimentArea.webkitRequestFullscreen();
-                }} else if (experimentArea.msRequestFullscreen) {{ /* IE11 */
+                }} else if (experimentArea.msRequestFullscreen) {{ 
                     experimentArea.msRequestFullscreen();
                 }}
+                */
 
                 isStarted = true;
                 taskStartTime = Date.now();
@@ -739,8 +739,9 @@ def main():
                     
                     screen.textContent = "";
 
-                    experimentArea.classList.remove('pseudo-fullscreen');
-                    if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
+                    // 全画面解除 (コメントアウト)
+                    // experimentArea.classList.remove('pseudo-fullscreen');
+                    // if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
 
                     updateStatus();
                 }}
