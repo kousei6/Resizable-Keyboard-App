@@ -22,8 +22,8 @@ def main():
         </style>
     """, unsafe_allow_html=True)
     
-    st.title("大きさの変わるキーボードアプリ (8方向1セット版)")
-    st.caption("「Start」ボタンを押すと全画面表示になります。ランダムな8方向の移動（1サイクル）が終了すると完了します（全8回）。")
+    st.title("大きさの変わるキーボードアプリ (8方向版)")
+    st.caption("「Start」ボタンを押すと全画面表示になります。8文字入力x8回（全方向1周）で終了し、座標の最大・最小が表示されます。")
 
     # --- サイドバー設定 ---
     with st.sidebar:
@@ -54,6 +54,7 @@ def main():
         
         # 移動パスの生成
         generated_path = []
+        # ★変更点1: 1サイクル(8方向)だけ生成するように変更 (元は20)
         cycle_count = 1 
         
         base_dirs = list(dir_vectors.values())
@@ -471,7 +472,7 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            const MAX_TRIALS = 8; 
+            const MAX_TRIALS = 8; // ★変更点2: 試行回数を8回に設定
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -502,11 +503,12 @@ def main():
                 
                 startBtn.disabled = true;
                 nextBtn.disabled = true;
-
-                // ★変更点: 記録されたデータから X, Y の最小・最大を計算
-                let msg = "8トライアル(1サイクル)終了しました。お疲れ様でした。";
+                
+                // ★変更点3: 記録されたデータから X, Y の最小・最大を計算して表示
+                let msg = "全8回のトライアルが終了しました。お疲れ様でした。";
                 
                 if (recordedData.length > 0) {{
+                    // 数値に変換して配列化
                     let xs = recordedData.map(d => parseFloat(d.kbX));
                     let ys = recordedData.map(d => parseFloat(d.kbY));
                     
@@ -515,10 +517,10 @@ def main():
                     let minY = Math.min(...ys);
                     let maxY = Math.max(...ys);
                     
-                    // Pythonのf-string内なので、JavaScriptの変数埋め込み ${{}} はエスケープが必要
+                    // Pythonのf-string内では、JSの変数を埋め込む ${{...}} をエスケープする必要があります
                     msg += `\\n\\n【記録された座標範囲】\\nKb_X: ${{minX.toFixed(1)}} ~ ${{maxX.toFixed(1)}}\\nKb_Y: ${{minY.toFixed(1)}} ~ ${{maxY.toFixed(1)}}`;
                 }}
-                
+
                 alert(msg + "\\nCSVをダウンロードしてください。");
             }}
 
