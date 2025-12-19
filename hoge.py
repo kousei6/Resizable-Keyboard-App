@@ -54,7 +54,6 @@ def main():
         
         # 移動パスの生成
         generated_path = []
-        # ★変更点: 1サイクル(8方向)だけ生成するように変更
         cycle_count = 1 
         
         base_dirs = list(dir_vectors.values())
@@ -472,7 +471,6 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            // ★変更点: ランダム8方向に対応するため 8回で終了とする
             const MAX_TRIALS = 8; 
 
             // --- 状態管理 ---
@@ -517,10 +515,11 @@ def main():
                     let minY = Math.min(...ys);
                     let maxY = Math.max(...ys);
                     
-                    msg += `\n\n【記録された座標範囲】\nKb_X: ${minX.toFixed(1)} ~ ${maxX.toFixed(1)}\nKb_Y: ${minY.toFixed(1)} ~ ${maxY.toFixed(1)}`;
+                    // Pythonのf-string内なので、JavaScriptの変数埋め込み ${{}} はエスケープが必要
+                    msg += `\\n\\n【記録された座標範囲】\\nKb_X: ${{minX.toFixed(1)}} ~ ${{maxX.toFixed(1)}}\\nKb_Y: ${{minY.toFixed(1)}} ~ ${{maxY.toFixed(1)}}`;
                 }}
                 
-                alert(msg + "\nCSVをダウンロードしてください。");
+                alert(msg + "\\nCSVをダウンロードしてください。");
             }}
 
             function updateScreenDisplay() {{
