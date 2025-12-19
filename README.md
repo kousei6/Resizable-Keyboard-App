@@ -109,6 +109,6 @@
 | **Pressure / FingerArea** | 筆圧 / 指の接地面積（対応デバイスのみ記録、PCでは0になることが多い） |
 
 ## アプリURL
-[app.py](https://github.com/kousei6/Resizable-Keyboard-App/blob/main/app.py)
+[app.py](https://keystroke-research-experiment.streamlit.app/)
 
-[app_test.py](https://github.com/kousei6/Resizable-Keyboard-App/blob/main/app_test.py)
+[app_test.py](https://keystroke-research-experiment1.streamlit.app/ )
