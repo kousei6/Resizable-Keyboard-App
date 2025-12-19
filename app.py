@@ -23,7 +23,7 @@ def main():
     """, unsafe_allow_html=True)
     
     st.title("大きさの変わるキーボードアプリ")
-    st.caption("「Start」ボタンを押すと全画面表示になります。10文字入力すると自動的に次の回に進みます（全25回）。")
+    st.caption("「Start」ボタンを押すと全画面表示になります。10文字入力すると自動的に次の回に進みます（全100回）。")
 
     # --- サイドバー設定 ---
     with st.sidebar:
