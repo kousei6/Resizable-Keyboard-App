@@ -22,8 +22,8 @@ def main():
         </style>
     """, unsafe_allow_html=True)
     
-    st.title("大きさの変わるキーボードアプリ")
-    st.caption("「Start」ボタンを押すと開始します（全画面にはなりません）。10文字入力すると自動的に次の回に進みます（全100回）。")
+    st.title("大きさの変わるキーボードアプリ (8方向・中心座標記録)")
+    st.caption("「Start」ボタンを押すと開始します（全画面にはなりません）。8文字入力x8回（1周）で終了し、キーボード中心座標の最大・最小が表示されます。")
 
     # --- サイドバー設定 ---
     with st.sidebar:
@@ -54,7 +54,8 @@ def main():
         
         # 移動パスの生成
         generated_path = []
-        cycle_count = 20 
+        # ★変更点: 1サイクル(8方向)だけ生成するように変更 (元は20)
+        cycle_count = 1
         
         base_dirs = list(dir_vectors.values())
         
@@ -471,7 +472,8 @@ def main():
             const targetString = "password18";
             
             const MAX_INPUT_LENGTH = 10;
-            const MAX_TRIALS = 100; 
+            // ★変更点1: 8方向1周で終了とする
+            const MAX_TRIALS = 8;
 
             // --- 状態管理 ---
             let recordedData = JSON.parse(sessionStorage.getItem('kb_data') || '[]');
@@ -492,7 +494,7 @@ def main():
                 moveWrap.classList.remove('active');
                 screen.classList.remove('focused');
                 
-                // ★ 全画面解除処理をコメントアウト(そもそも全画面にしていないため)
+                // 全画面解除処理も不要ならコメントアウト
                 // experimentArea.classList.remove('pseudo-fullscreen');
                 // if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
                 
@@ -503,10 +505,11 @@ def main():
                 startBtn.disabled = true;
                 nextBtn.disabled = true;
 
-                // ★ 追加: 座標範囲の計算と表示
-                let msg = "100トライアル終了しました。お疲れ様でした。";
+                // ★変更点2: 記録されたデータから X, Y の最小・最大を計算して表示
+                let msg = "8トライアル(1サイクル)終了しました。お疲れ様でした。";
                 
                 if (recordedData.length > 0) {{
+                    // 数値に変換して配列化 (kbX, kbYは中心座標として記録済み)
                     let xs = recordedData.map(d => parseFloat(d.kbX));
                     let ys = recordedData.map(d => parseFloat(d.kbY));
                     
@@ -515,10 +518,10 @@ def main():
                     let minY = Math.min(...ys);
                     let maxY = Math.max(...ys);
                     
-                    // Python f-string内でのJS変数展開のため {{ }} でエスケープ
-                    msg += `\\n\\n【記録された座標範囲】\\nKb_X: ${{minX.toFixed(1)}} ~ ${{maxX.toFixed(1)}}\\nKb_Y: ${{minY.toFixed(1)}} ~ ${{maxY.toFixed(1)}}`;
+                    // JSの変数展開 ${{}} をPythonのf-string内で使うためエスケープ
+                    msg += `\\n\\n【キーボード中心座標の範囲】\\nKb_X: ${{minX.toFixed(1)}} ~ ${{maxX.toFixed(1)}}\\nKb_Y: ${{minY.toFixed(1)}} ~ ${{maxY.toFixed(1)}}`;
                 }}
-
+                
                 alert(msg + "\\nCSVをダウンロードしてください。");
             }}
 
@@ -537,7 +540,7 @@ def main():
                      return;
                 }}
 
-                // ★ 変更点: 全画面表示(pseudo-fullscreen / requestFullscreen)を無効化
+                // ★変更点3: 全画面表示処理をすべてコメントアウト (無効化)
                 
                 // experimentArea.classList.add('pseudo-fullscreen');
 
@@ -604,6 +607,10 @@ def main():
                         let upDownTime = (now - lastUpTime);
                         let timeFromStart = (now - taskStartTime);
 
+                        // ★変更点4: kbX, kbY を「中心座標」として記録する
+                        let centerX = rect.x + rect.width / 2;
+                        let centerY = rect.y + rect.height / 2;
+
                         keyDiv._currentData = {{
                             trial: currentTrial,
                             key: keyVal,
@@ -612,8 +619,8 @@ def main():
                             downDown: downDownTime,
                             upDown: upDownTime,
                             kbScale: currentScale.toFixed(3),
-                            kbX: rect.x.toFixed(1),
-                            kbY: rect.y.toFixed(1),
+                            kbX: centerX.toFixed(1), // 中心X
+                            kbY: centerY.toFixed(1), // 中心Y
                             pressure: e.pressure || 0,
                             area: (e.width * e.height).toFixed(2)
                         }};
@@ -739,7 +746,7 @@ def main():
                     
                     screen.textContent = "";
 
-                    // 全画面解除 (コメントアウト)
+                    // 全画面解除処理もコメントアウト
                     // experimentArea.classList.remove('pseudo-fullscreen');
                     // if (document.exitFullscreen) document.exitFullscreen().catch(e => {{}});
 
