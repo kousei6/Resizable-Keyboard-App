@@ -1,17 +1,21 @@
 # 大きさの変わるキーボードアプリ (Accumulated Data Keyboard)
 
-このアプリケーションは、動的にサイズや位置が変化するソフトウェアキーボードを用いて、ユーザーの入力行動（キーストロークダイナミクス）データを収集するための Streamlit アプリケーションです。
+動的にサイズや位置が変化するソフトウェアキーボードを用いて、キーストロークダイナミクスを収集する Streamlit アプリです。視覚的負荷（拡大・移動）が入力行動に与える影響を分析する研究・実験用途を想定しています。
 
-研究や実験において、視覚的な負荷（キーボードの拡大縮小・移動）が入力パフォーマンスに与える影響を分析するために設計されています。
+<img width="1018" height="763" alt="image" src="https://github.com/user-attachments/assets/2fdba38a-6559-492f-8f6c-44cd42daab63" />
 
-## ファイル構成と違い
+## デモ
+- [訓練データ用](https://keystroke-research-experiment.streamlit.app/)
+- [テストデータ用](https://keystroke-research-experiment1.streamlit.app/)
+
+## ファイル構成
 
 このリポジトリには、主に2つのアプリケーションファイルが含まれています。目的に応じて使い分けてください。
 
-| ファイル名 | 用途 | 試行回数 (Trials) | 説明 |
-| :--- | :--- | :--- | :--- |
-| **`app.py`** | **訓練データ用** | **100回** | 本格的なデータ収集を行うためのメインスクリプトです。 |
-| **`app_test.py`** | **テストデータ用** | **25回** | セットアップ時の動作確認や、短時間でのデモ・テストを行うための軽量版です。 |
+| ファイル名 | 用途 | 試行回数 (Trials) |
+| :--- | :--- | :--- | 
+| **`app.py`** | **訓練データ用** | **100回** | 
+| **`app_test.py`** | **テストデータ用** | **25回** | 
 
 ## 主な特徴
 
@@ -108,7 +112,6 @@
 | **Kb\_X / Kb\_Y** | 打鍵時のキーボード座標 (BoundingClientRect) |
 | **Pressure / FingerArea** | 筆圧 / 指の接地面積（対応デバイスのみ記録、PCでは0になることが多い） |
 
-## アプリURL
-[app.py](https://keystroke-research-experiment.streamlit.app/)
-
-[app_test.py](https://keystroke-research-experiment1.streamlit.app/ )
+## 想定用途
+- キーストロークダイナミクス研究
+- 視覚的負荷が入力行動に与える影響分析
